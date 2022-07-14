@@ -14,10 +14,24 @@ cache:
 
 script: "./gradlew clean build"
 
+before_deploy: # CodeDeploy는 Jar 파일은 인식하지 못하므로 jar + 기타 설정 파일들을 모아 zip 파일로 만든다
+  - zip -r web_book * # 현재 위치의 모든 파일을 web_book(프로젝트 명) 이름으로 압축한다
+  - mkdir -p deploy # deploy라는 디렉토리를 Travis CI가 실행중인 위치에 생성한다
+  - mv web_book.zip deploy/web_book.zip
+
+deploy: # S3로 파일 압로드 혹은 CodeDeploy로 배포 등 외부 사비스와 연동될 행위들을 선언한다
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY # Travis repo settings에 설정된 값
+    secret_access_key: $AWS_SECRET_KEY
+    bucket: jjd-springboot-build
+    region: ap-northeast-2
+    skip_cleanup: true
+    acl: private # zip 파일 접근을 private로
+    local_dir: deploy # before_deploy에서 생성한 디렉토리 / 해당 위치의 파일들만 S3로 전송한다
+    wait-until-deployed: true
+
 # CI 실행 완료 시 메일로 알람
 notifications:
   email:
     recipients:
       - kmus1232@gmail.com
-
-#test
