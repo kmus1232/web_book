@@ -32,6 +32,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 }
 
+// test
+
 /**
  * 1. @EnableWebSecurity
  *     1. Spring Security 설정들을 활성화시켜 준다.
